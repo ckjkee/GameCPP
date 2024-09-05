@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "MainCharacter.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "PlayerCharacter.generated.h"
 
-
+class USpringArmComponent;
+class UCameraComponent;
 /**
  * 
  */
@@ -50,9 +49,15 @@ public:
 
 	void DecreaseStamina();
 
+    void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
 	bool bIsSprinting;
-	float CurrentStamina;
+	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
 	float MinusStamina = 1.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
 	float PlusStamina = 1.f;
-	//float Stamina = 100.f;
+	UPROPERTY(EditDefaultsOnly, Category = "Stamina", meta = (ClampMin = "0", ClampMax = "100"))
+	float Stamina = 100.f; 
+
 };

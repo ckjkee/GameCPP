@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Components/CapsuleComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "MainCharacter.generated.h"
 
 UCLASS()

@@ -2,9 +2,15 @@
 
 
 #include "PlayerCharacter.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Math/UnrealMathUtility.h"
 
 APlayerCharacter::APlayerCharacter() : Super()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->TargetArmLength = 500.f;
@@ -70,18 +76,51 @@ void APlayerCharacter::StopJump()
 //===============================Sprint==============================//
 void APlayerCharacter::Sprint()
 {
+	bIsSprinting = true;
+	GetCharacterMovement()->MaxWalkSpeed = 1200.f;
+	DecreaseStamina();
 }
 
 void APlayerCharacter::StopSprinting()
 {
+	bIsSprinting = false;
+	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	IncreaseStamina();
+	
 }
 
 void APlayerCharacter::IncreaseStamina()
 {
-}
+	Stamina = Stamina + PlusStamina;
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Stamina Increase %f"), Stamina));
+	}
+}	
 
 void APlayerCharacter::DecreaseStamina()
 {
+	Stamina = Stamina - MinusStamina;
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Stamina Decrease %f"), Stamina));
+	}
+}
+
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	if (bIsSprinting && Stamina != 0.f)
+	{
+		DecreaseStamina();
+	}
+	if (Stamina != 100.f && !bIsSprinting)
+	{
+		IncreaseStamina();
+	}
+	if (FMath::IsNearlyZero(Stamina))
+	{
+		StopSprinting();
+	}
 }
 
 
