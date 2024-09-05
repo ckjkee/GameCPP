@@ -1,1 +1,1 @@
-Hello! This is my very first pet project, game to be clear, using C++ in Unreal Engine. Here you, especially me, can see my progress. Peace for all.
+Hello! This is my very first pet project, game to be clear, using C++ in Unreal Engine. Here you, especially me, can see my progress. Code Style is not great and not all data is divided correctly among public/private sections, just learning the basics. Peace for all.
