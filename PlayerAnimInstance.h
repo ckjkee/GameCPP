@@ -21,4 +21,5 @@ public:
 	 APawn* MyCharacter;
 	 UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	 float Speed;
+	 
 };

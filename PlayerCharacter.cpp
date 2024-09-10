@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include <Kismet/KismetSystemLibrary.h>
+#include <Kismet/GameplayStatics.h>
 
 APlayerCharacter::APlayerCharacter() : Super()
 {
@@ -76,17 +78,14 @@ void APlayerCharacter::StopJump()
 //===============================Sprint==============================//
 void APlayerCharacter::Sprint()
 {
-	bIsSprinting = true;
-	GetCharacterMovement()->MaxWalkSpeed = 1200.f;
-	DecreaseStamina();
+		bIsSprinting = true;
+		GetCharacterMovement()->MaxWalkSpeed = 1200.f;
 }
 
 void APlayerCharacter::StopSprinting()
 {
-	bIsSprinting = false;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	IncreaseStamina();
-	
+		bIsSprinting = false;
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 
 void APlayerCharacter::IncreaseStamina()
@@ -109,17 +108,57 @@ void APlayerCharacter::DecreaseStamina()
 
 void APlayerCharacter::Tick(float DeltaTime)
 {
-	if (bIsSprinting && Stamina != 0.f)
+	Super::Tick(DeltaTime);
+	RegulateStamina();
+	TouchEnemy();
+}
+
+void APlayerCharacter::RegulateStamina()
+{
+	if (bIsSprinting && Stamina)
 	{
 		DecreaseStamina();
 	}
-	if (Stamina != 100.f && !bIsSprinting)
+	if (!bIsSprinting && Stamina < 100.f)
 	{
 		IncreaseStamina();
 	}
 	if (FMath::IsNearlyZero(Stamina))
 	{
 		StopSprinting();
+	}
+}
+
+void APlayerCharacter::AddStamina_Implementation(float value)
+{
+	Stamina += value;
+}
+
+void APlayerCharacter::TouchEnemy()
+{
+	FVector TraceStart = GetActorLocation();
+	FRotator CharacterRotation = GetActorRotation();
+	FVector TraceEnd = TraceStart + (CharacterRotation.Vector() * 300.f);
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	
+	
+
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1.f, 0, 1.f);
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams);
+	
+
+	if (HitResult.bBlockingHit)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, FString::Printf(TEXT("You hit: %s"), *HitResult.GetActor()->GetName()));
+	}
+
+	AActor* Target = HitResult.GetActor();
+	if (Target && Target->ActorHasTag(FName("Enemy")))
+	{
+		UKismetSystemLibrary::QuitGame(this, UGameplayStatics::GetPlayerController(this, 0), EQuitPreference::Quit, true);
 	}
 }
 

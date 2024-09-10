@@ -4,15 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "MainCharacter.h"
+#include "InteractionInterface.h"
 #include "PlayerCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
+
 /**
  * 
  */
 UCLASS()
-class GAMETUTORIALCPP_API APlayerCharacter : public AMainCharacter
+class GAMETUTORIALCPP_API APlayerCharacter : public AMainCharacter,  public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -51,6 +53,8 @@ public:
 
     void Tick(float DeltaTime) override;
 
+	void RegulateStamina();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
 	bool bIsSprinting;
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina")
@@ -59,5 +63,15 @@ public:
 	float PlusStamina = 1.f;
 	UPROPERTY(EditDefaultsOnly, Category = "Stamina", meta = (ClampMin = "0", ClampMax = "100"))
 	float Stamina = 100.f; 
+
+	//===========================================IInterface=================================//
+
+	
+	void AddStamina_Implementation(float value) override;
+
+	//===============================LineTrace===================================//
+
+	UFUNCTION()
+	void TouchEnemy();
 
 };
